@@ -1,23 +1,18 @@
-struct Data
-    dimension::Int
-    p::Int
-    matrix::Matrix{Int}
-end
+include("structs.jl")
 
-function read_instance(filePath::String)
+function readInstance(filePath::String)
     open(filePath) do file
-        dataVec = Vector{Int}[]
+        data_vec = Vector{Int}[]
         dimension = parse(Int, split(readline(file))[2])
         p = parse(Int, split(readline(file))[2])
 
         # Ignoring useless line
         readline(file)
-        
+
         for line in eachline(file)
-            push!(dataVec, map(x->parse(Int, x), split(line)))
+            push!(data_vec, map(x->parse(Int, x), split(line)))
         end
 
-        return Data(dimension, p, transpose(reshape(vcat(dataVec...), dimension, :)))
+        return Data(dimension, p, Matrix(transpose(reshape(vcat(data_vec...), dimension, :))))
     end
-
 end
