@@ -1,6 +1,6 @@
 include("structs.jl")
 
-function swap(s::Solution{T}, matrix::Matrix{T}) where {T}
+function swap!(s::Solution{T}, matrix::Matrix{T}) where {T}
     best = Move(0, 0, typemax(T))
 
     # Repeating until the swap with lowest delta is found
@@ -33,7 +33,7 @@ function swap(s::Solution{T}, matrix::Matrix{T}) where {T}
 end
 
 # 2-opt, but Julia syntax won't let me name it like that, so...
-function revert(s::Solution{T}, matrix::Matrix{T}) where {T}
+function revert!(s::Solution{T}, matrix::Matrix{T}) where {T}
     best = Move(0, 0, typemax(T))
 
     for i in 1:length(s.route)-2
@@ -58,7 +58,7 @@ function revert(s::Solution{T}, matrix::Matrix{T}) where {T}
     return false
 end
 
-function reinsert(s::Solution{T}, matrix::Matrix{T}, num::Int) where {T}
+function reinsert!(s::Solution{T}, matrix::Matrix{T}, num::Int) where {T}
     best = Move(0, 0, typemax(T))
 
     for i in 1:length(s.route)-num
@@ -88,12 +88,23 @@ function reinsert(s::Solution{T}, matrix::Matrix{T}, num::Int) where {T}
     end
             
     if best.time < 0
+        i, j = min(best.i, best.j), max(best.i, best.j)+(num-1)
         s.time += best.time
-        
-        #TODO: Reinsertion in the route
-
+        s.route[i:j] = circshift(s.route[i:j], best.i < best.j ? num : -num)
         return true
     end
 
     return false
+end
+
+function reinsert1!(s::Solution{T}, matrix::Matrix{T}) where {T}
+    reinsert!(s, matrix, 1)
+end
+
+function reinsert2!(s::Solution{T}, matrix::Matrix{T}) where {T}
+    reinsert!(s, matrix, 2)
+end
+
+function reinsert3!(s::Solution{T}, matrix::Matrix{T}) where {T}
+    reinsert!(s, matrix, 3)
 end
