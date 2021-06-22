@@ -10,7 +10,7 @@ mutable struct Move{T}
     time::T
 end
 
-mutable struct Solution{T}
-    route::Vector{Int}
-    time::T
+Base.@kwdef mutable struct Solution{T}
+    route::Vector{Int} = Int[]
+    time::T = zero(T)
 end

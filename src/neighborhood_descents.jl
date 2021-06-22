@@ -1,7 +1,5 @@
 include("neighborhood_movements.jl")
 
-# default_neighbor_list = [swap!, revert!, reinsert1!, reinsert2!, reinsert3!]
-
 function VND!(s::Solution{T}, matrix::Matrix{T}, neighbor_list::Vector{Function}) where {T}    
     for i in 1:length(neighbor_list)
         if neighbor_list[i](s, matrix)
