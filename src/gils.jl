@@ -11,23 +11,23 @@ function perturb!(s::Solution{T}, dimension::Int, matrix::Matrix{T}) where {T}
     i = rand(1:(dimension - (i_size+j_size+2)))
     j = rand(1:(dimension - (i+i_size+j_size+1) + (i+i_size)))
 
-    sub_route1 = view(s, i:i+i_size)
-    sub_route2 = view(s, j:j+j_size)
+    sub_route1 = view(s.route, i:i+i_size)
+    sub_route2 = view(s.route, j:j+j_size)
 
-    s.cost -=  matrix[s.route[i-1]][s.route[i]]
-              +matrix[s.route[i+i_size]][s.route[i+i_size+1]]
-              +((i+i_size+1 == j) ? 0 : matrix[s.route[j-1]][s.route[j]])   #Checks if the subsequences are adjacent
-              +matrix[s.route[j+j_size]][s.route[j+j_size+1]]
+    s.cost -= matrix[s.route[i-1]][s.route[i]] +
+              matrix[s.route[i+i_size]][s.route[i+i_size+1]] +
+              ((i+i_size+1 == j) ? 0 : matrix[s.route[j-1]][s.route[j]]) +   #Checks if the subsequences are adjacent
+              matrix[s.route[j+j_size]][s.route[j+j_size+1]]
 
     deleteat!(s.route, j:j+j_size)
     deleteat!(s.route, i:i+i_size)
     insert!(s.route, i, sub_route2)
     insert!(s.route, j + (j_size-i_size), sub_route1)
 
-    s.cost +=  matrix[s.route[i-1]][s.route[i]]
-              +matrix[s.route[i+j_size]][s.route[i+j_size+1]]
-              +((i+i_size+1 == j) ? 0 : matrix[s.route[j + (j_size-i_size)-1]][s.route[j + (j_size-i_size)]])
-              +matrix[s.route[j+j_size]][s.route[j+j_size+1]]
+    s.cost += matrix[s.route[i-1]][s.route[i]] +
+              matrix[s.route[i+j_size]][s.route[i+j_size+1]] +
+              ((i+i_size+1 == j) ? 0 : matrix[s.route[j + (j_size-i_size)-1]][s.route[j + (j_size-i_size)]]) +
+              matrix[s.route[j+j_size]][s.route[j+j_size+1]]
 end
 
 
@@ -43,7 +43,7 @@ function GILS(data::Data{T}, i_max::Int) where {T}
         best.time = typemax(T)
 
         for i in 1:i_ils
-            s = RVND!(s, data.matrix, neighbor_list)
+            RVND!(s, data.matrix, neighbor_list)
 
             if s.time < best.time
                 i = 0

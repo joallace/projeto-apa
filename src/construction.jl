@@ -30,7 +30,7 @@ function construction(α::AbstractFloat, dimension::Int, matrix::Matrix{T}) wher
     for candidate in 1:dimension
         push!(candidate_list, candidate)
     end
-    
+
     s = subtour!(candidate_list, 3, dimension, matrix)
     
     # Repeating until a feasible initial solution is found
@@ -38,33 +38,19 @@ function construction(α::AbstractFloat, dimension::Int, matrix::Matrix{T}) wher
         # Calculating the insertion cost of each one of the remaining candidates
         time_vector = Move{T}[]
 
-        for i in 2:length(s.route)-1, j in 1:length(candidate_list)
-            push!(time_vector,
-                  Move(
-                      j,
-                      i,
-                      matrix[s.route[i], candidate_list[j]] 
-                     +matrix[candidate_list[j], s.route[i+1]]
-                     -matrix[s.route[i], s.route[i+1]]
-                  ))
+        for i in 1:length(s.route)-1, j in 1:length(candidate_list)
+            push!(time_vector, Move(j, i, matrix[s.route[i], candidate_list[j]] + matrix[candidate_list[j], s.route[i+1]] - matrix[s.route[i], s.route[i+1]]))
         end
     
         sort!(time_vector, by = x -> x.time)
         
-        # Obtaining an item in a random interval of the time_vector
+        # Obtaining an item at a random index of the time_vector
         next_node = ceil(Int, rand(1:length(time_vector)) * α)
 
         # Inserting the item into the solution and removing it from the candidate list
-        insert!(s.route, time_vector[next_node].j, candidate_list[time_vector[next_node].i])
-        deleteat!(candidate_list, time_vector[next_node].i)
+        insert!(s.route, time_vector[next_node].j+1, candidate_list[time_vector[next_node].i])
         s.time += time_vector[next_node].time
-
-        if getRealCost(s, matrix) != s.time
-            println("[CONSTRUCTION]")
-            println("Real cost = ", getRealCost(s, matrix))
-            @show(s)
-            println()
-        end
+        deleteat!(candidate_list, time_vector[next_node].i)
     end
 
     return s
