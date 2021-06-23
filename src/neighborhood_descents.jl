@@ -15,8 +15,8 @@ function RVND!(s::Solution{T}, matrix::Matrix{T}, default_neighbor_list::Vector{
     while !isempty(neighbor_list)
         i = rand(1:length(neighbor_list))
 
+        println("[BEFORE ", neighbor_list[i], "]")
         if getRealCost(s, matrix) != s.time
-            println("[BEFORE ", neighbor_list[i], "]")
             println("Real cost = ", getRealCost(s, matrix))
             @show(s)
             println()

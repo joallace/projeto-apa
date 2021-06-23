@@ -51,7 +51,7 @@ function revert!(s::Solution{T}, matrix::Matrix{T}) where {T}
 
     if best.time < 0
         s.time += best.time
-        reverse!(s.route, best.i, best.j+1)
+        reverse!(s.route, best.i, best.j)
         return true
     end
     
@@ -90,7 +90,7 @@ function reinsert!(s::Solution{T}, matrix::Matrix{T}, num::Int) where {T}
     if best.time < 0
         i, j = min(best.i, best.j), max(best.i, best.j)+(num-1)
         s.time += best.time
-        s.route[i:j] = circshift(s.route[i:j], best.i < best.j ? num : -num)
+        s.route[i:j] = circshift(s.route[i:j], best.i < best.j ? -num : num)
         return true
     end
 
