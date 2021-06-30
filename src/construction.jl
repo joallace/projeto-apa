@@ -2,7 +2,7 @@ include("structs.jl")
 
 function subtour!(candidate_list::Vector{Int}, subtour_size, dimension::Int, matrix::Matrix{T}) where {T}
     # Obtaining an initial item randomly
-    s = Solution{T}()
+    s = Solution{T}(Int[], zero(T))
     first = rand(1:dimension)
 
     # Inserting it into the solution and removing it from the candidate list

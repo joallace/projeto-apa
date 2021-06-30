@@ -3,11 +3,10 @@ include("src/gils.jl")
 
 function main()
     data = readInstance(ARGS[1])
-    display(data.matrix)
-    println()
     solution = GILS(data, 50)
 
-    println(solution)
+    println("\nTime = ", solution.time)
+    println("Route = ", solution.route)
 
     return 0
 end

@@ -10,7 +10,9 @@ mutable struct Move{T}
     time::T
 end
 
-Base.@kwdef mutable struct Solution{T}
-    route::Vector{Int} = Int[]
-    time::T = zero(T)
+mutable struct Solution{T}
+    route::Vector{Int}
+    time::T
 end
+
+Base.copy(x::Solution{T}) where T = Solution{T}(copy(x.route), x.time)
