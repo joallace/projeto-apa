@@ -1,11 +1,13 @@
 include("structs.jl")
 
-function subtour!(candidate_list::Vector{Int}, subtour_size::Int, matrix::Matrix{T}) where {T}
+function subtour!(candidate_list::Vector{Int}, subtour_size, dimension::Int, matrix::Matrix{T}) where {T}
     # Obtaining an initial item randomly
-    s = Solution{T}(time = zero(T))
+    s = Solution{T}(Int[], zero(T))
+    first = rand(1:dimension)
 
     # Inserting it into the solution and removing it from the candidate list
-    push!(s.routes, [1])
+    push!(s.route, first)
+    deleteat!(candidate_list, first)
 
     # Inserting random items from the candidate list into the solution
     for i in 1:subtour_size
@@ -16,7 +18,7 @@ function subtour!(candidate_list::Vector{Int}, subtour_size::Int, matrix::Matrix
     end
 
     # Finishing the Hamiltonian cycle
-    push!(s.routes[end], 1)
+    push!(s.route, first)
     s.time += matrix[s.route[end-1], s.route[end]]
 
     return s
@@ -25,11 +27,11 @@ end
 function construction(α::AbstractFloat, dimension::Int, matrix::Matrix{T}) where {T}
     # Filling up the candidate list
     candidate_list = Int[]
-    for candidate in 2:dimension
+    for candidate in 1:dimension
         push!(candidate_list, candidate)
     end
 
-    s = subtour!(candidate_list, 3, matrix)
+    s = subtour!(candidate_list, 3, dimension, matrix)
     
     # Repeating until a feasible initial solution is found
     while !isempty(candidate_list)

@@ -36,8 +36,8 @@ end
 
 
 function GILS(data::Data{T}, i_max::Int) where {T}
-    final = Solution{T}()
-    best = Solution{T}()
+    final = Solution{T}(Int[], typemax(T))
+    best = Solution{T}(Int[], typemax(T))
 
     i_ils = data.dimension>=150 ? ceil(Int, data.dimension/2) : data.dimension
     neighbor_list = Function[swap!, revert!, reinsert1!, reinsert2!, reinsert3!]

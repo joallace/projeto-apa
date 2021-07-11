@@ -10,9 +10,9 @@ mutable struct Move{T}
     time::T
 end
 
-mutable struct Solution{T}
-    route::Vector{Int}
-    time::T
+Base.@kwdef mutable struct Solution{T}
+    routes::Vector{Vector{Int}} = Vector{Vector{Int}}()
+    time::T = typemax(T)
 end
 
-Base.copy(x::Solution{T}) where T = Solution{T}(copy(x.route), x.time)
+Base.copy(x::Solution{T}) where T = Solution{T}(deepcopy(x.routes), x.time)
