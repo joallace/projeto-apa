@@ -41,11 +41,11 @@ function shift!(s::Solution{T}, matrix::Matrix{T}, num::Int) where {T}
 
     for rid1 in 1:length(s.routes)
         for rid2 in i + 1:length(s.routes)
-            for i in 2:length(s.routes[rid])-num
+            for i in 2:length(s.routes[rid1])-num
                 rm_delta = matrix[s.routes[rid1][i-1], s.routes[rid1][i+num]] -
                            matrix[s.routes[rid1][i-1], s.routes[rid1][i]] -
                            matrix[s.routes[rid1][i+(num-1)], s.routes[rid1][i+num]]
-                for j in 2:length(s.routes[rid])-num
+                for j in 2:length(s.routes[rid2])-num
                     # Checking if the j index is the same as the beginning of the subsequence
                     if j > i
                         delta = rm_delta +
