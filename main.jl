@@ -6,7 +6,7 @@ function main()
     solution = GILS(data, 50)
 
     println("\nTime = ", solution.time)
-    println("Route = ", solution.route)
+    println("Route = ", solution.routes)
 
     return 0
 end

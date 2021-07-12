@@ -31,33 +31,34 @@ function construction(α::AbstractFloat, p::Int, dimension::Int, matrix::Matrix{
         push!(candidate_list, candidate)
     end
 
-    n_routes = ceil(Int, (dimension-1)/p)
+    n_routes = ceil(Int, (dimension - 1)/p)
     s = subtours!(candidate_list, 3, n_routes, matrix)
-    
-    # Repeating until a feasible initial solution is found
-    while !isempty(candidate_list)
-        for route in 1:n_routes
-            for _ in 3:p
-                # Calculating the insertion cost of each one of the remaining candidates
-                time_vector = Move{T}[]
 
-                for i in 1:length(s.routes[route])-1, j in 1:length(candidate_list)
-                    push!(time_vector, Move(j, i,
-                    matrix[s.routes[route][i], candidate_list[j]] 
-                    + matrix[candidate_list[j], s.routes[route][i+1]] 
-                        - matrix[s.routes[route][i], s.routes[route][i+1]]))
-                end
-            
-                sort!(time_vector, by = x -> x.time)
-                
-                # Obtaining an item at a random index of the time_vector
-                next_node = ceil(Int, rand(1:length(time_vector)) * α)
-
-                # Inserting the item into the solution and removing it from the candidate list
-                insert!(s.route, time_vector[next_node].j+1, candidate_list[time_vector[next_node].i])
-                s.time += time_vector[next_node].time
-                deleteat!(candidate_list, time_vector[next_node].i)
+    for rid in 1:n_routes
+        for _ in 4:p
+            if isempty(candidate_list)
+                break
             end
+
+            # Calculating the insertion cost of each one of the remaining candidates
+            time_vector = Move{T}[]
+
+            for i in 1:length(s.routes[rid])-1, j in 1:length(candidate_list)
+                push!(time_vector, Move(j, i,
+                  matrix[s.routes[rid][i], candidate_list[j]] 
+                + matrix[candidate_list[j], s.routes[rid][i+1]] 
+                - matrix[s.routes[rid][i], s.routes[rid][i+1]]))
+            end
+
+            sort!(time_vector, by = x -> x.time)
+
+            # Obtaining an item at a random index of the time_vector
+            next_node = ceil(Int, rand(1:length(time_vector)) * α)
+
+            # Inserting the item into the solution and removing it from the candidate list
+            s.time += time_vector[next_node].time
+            insert!(s.routes[rid], time_vector[next_node].j+1, candidate_list[time_vector[next_node].i])
+            deleteat!(candidate_list, time_vector[next_node].i)
         end
     end
 
