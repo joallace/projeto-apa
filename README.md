@@ -4,8 +4,8 @@ Esse repositório contém o nosso projeto final da disciplina Análise e Projeto
 
 ## Etapas
 
-- [ ] Implementação de pelo menos uma heurística de construção;
-- [ ] Implementação dos movimentos de vizinhança (Mínimo 3);
+- [x] Implementação de pelo menos uma heurística de construção;
+- [x] Implementação dos movimentos de vizinhança (Mínimo 3);
 - [X] Implementação do algoritmo de busca local chamado VND (Variable Neighborhood Descent);
 - [X] Implementação de uma metaheurística (OPCIONAL);
 - [ ] Resultados computacionais: criar uma tabela que contenha os resultados obtidos pela(s) heurística(s)
