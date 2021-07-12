@@ -1,6 +1,15 @@
 include("neighborhood_movements.jl")
 
-function VND!(s::Solution{T}, neighbor_list::Vector{Function}, matrix::Matrix{T}) where {T}    
+function VND!(s::Solution{T}, neighbor_list::Vector{Function}, intra_neighbor_list::Vector{Function}, matrix::Matrix{T}) where {T}    
+    for i in 1:length(neighbor_list)
+        if neighbor_list[i](s, matrix)
+            intra_VND!(s, intra_neighbor_list, matrix)
+            i = 1
+        end
+    end
+end
+
+function intra_VND!(s::Solution{T}, neighbor_list::Vector{Function}, matrix::Matrix{T}) where {T}    
     for rid in 1:length(s.routes)
         for i in 1:length(neighbor_list)
             if neighbor_list[i](s, rid, matrix)
@@ -11,7 +20,7 @@ function VND!(s::Solution{T}, neighbor_list::Vector{Function}, matrix::Matrix{T}
 end
 
 # refatorar pra inter rota
-function RVND!(s::Solution{T}, default_neighbor_list::Vector{Function}, matrix::Matrix{T}) where {T}
+function intra_RVND!(s::Solution{T}, default_neighbor_list::Vector{Function}, matrix::Matrix{T}) where {T}
     for rid in 1:length(s.routes)
         neighbor_list = copy(default_neighbor_list)
         

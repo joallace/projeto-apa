@@ -10,6 +10,14 @@ mutable struct Move{T}
     time::T
 end
 
+mutable struct InterMove{T}
+    rid1::Int
+    rid2::Int
+    i::Int
+    j::Int
+    time::T
+end
+
 Base.@kwdef mutable struct Solution{T}
     routes::Vector{Vector{Int}} = Vector{Vector{Int}}()
     time::T = typemax(T)
