@@ -48,14 +48,14 @@ function GILS(data::Data{T}, i_max::Int) where {T}
 
     i_ils = data.dimension>=150 ? ceil(Int, data.dimension/2) : data.dimension
     intra_neighbor_list = Function[swap!, revert!, reinsert1!, reinsert2!, reinsert3!]
-    inter_neighbor_list = Function[inter_swap!]
+    inter_neighbor_list = Function[inter_swap!, shift1!, shift2!, shift3!]
 
     for _ in 1:i_max
         s = construction(rand(Float32), data.p, data.dimension, data.matrix)
         best.time = typemax(T)
 
         for i in 1:i_ils
-            VND!(s, inter_neighbor_list, intra_neighbor_list, data.matrix)
+            RVND!(s, inter_neighbor_list, intra_neighbor_list, data.p, data.matrix)
 
             if s.time < best.time
                 best = copy(s)

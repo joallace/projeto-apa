@@ -1,10 +1,10 @@
 include("structs.jl")
 
-function inter_swap!(s::Solution{T}, matrix::Matrix{T}) where {T}
+function inter_swap!(s::Solution{T}, matrix::Matrix{T}, args...) where {T}
     best = InterMove(0, 0, 0, 0, typemax(T))
 
     for rid1 in 1:length(s.routes)
-        for rid2 in rid1 + 1:length(s.routes)
+        for rid2 in rid1+1:length(s.routes)
 
             # Repeating until the swap with lowest delta is found
             for i in 2:length(s.routes[rid1])-1
@@ -36,28 +36,24 @@ function inter_swap!(s::Solution{T}, matrix::Matrix{T}) where {T}
     return false
 end
 
-function shift!(s::Solution{T}, matrix::Matrix{T}, num::Int) where {T}
+function shift!(s::Solution{T}, matrix::Matrix{T}, p::Int, num::Int) where {T}
     best = InterMove(0, 0, 0, 0, typemax(T))
 
     for rid1 in 1:length(s.routes)
-        for rid2 in i + 1:length(s.routes)
+        for rid2 in 1:length(s.routes)
+            if length(s.routes[rid2])-2 >= p || rid1==rid2
+                continue
+            end
+
             for i in 2:length(s.routes[rid1])-num
                 rm_delta = matrix[s.routes[rid1][i-1], s.routes[rid1][i+num]] -
                            matrix[s.routes[rid1][i-1], s.routes[rid1][i]] -
                            matrix[s.routes[rid1][i+(num-1)], s.routes[rid1][i+num]]
                 for j in 2:length(s.routes[rid2])-num
-                    # Checking if the j index is the same as the beginning of the subsequence
-                    if j > i
-                        delta = rm_delta +
-                                matrix[s.routes[rid][j+(num-1)], s.routes[rid][i]] +
-                                matrix[s.routes[rid][i+(num-1)], s.routes[rid][j+num]] -
-                                matrix[s.routes[rid][j+(num-1)], s.routes[rid][j+num]]
-                    else
-                        delta = rm_delta +
-                                matrix[s.routes[rid][j-1], s.routes[rid][i]] +
-                                matrix[s.routes[rid][i+(num-1)], s.routes[rid][j]] -
-                                matrix[s.routes[rid][j], s.routes[rid][j-1]]
-                    end
+                    delta = rm_delta -
+                            matrix[s.routes[rid2][j-1], s.routes[rid2][j]] +
+                            matrix[s.routes[rid2][j-1], s.routes[rid1][i]] +
+                            matrix[s.routes[rid1][i+(num-1)], s.routes[rid2][j]]
                     
                     if delta < 0 && delta < best.time
                         best = InterMove(rid1, rid2, i, j, delta)
@@ -68,9 +64,9 @@ function shift!(s::Solution{T}, matrix::Matrix{T}, num::Int) where {T}
     end
             
     if best.time < 0
-        i, j = min(best.i, best.j), max(best.i, best.j)+(num-1)
         s.time += best.time
-        s.routes[rid][i:j] = circshift(s.routes[rid][i:j], best.i < best.j ? -num : num)
+        splice!(s.routes[best.rid2], best.j:0, s.routes[best.rid1][best.i : best.i+num-1])
+        deleteat!(s.routes[best.rid1], best.i : best.i+num-1)
         return true
     end
 
@@ -184,4 +180,16 @@ end
 
 function reinsert3!(s::Solution{T}, rid::Int, matrix::Matrix{T}) where {T}
     reinsert!(s, rid, matrix, 3)
+end
+
+function shift1!(s::Solution{T}, matrix::Matrix{T}, p::Int) where {T}
+    shift!(s, matrix, p, 1)
+end
+
+function shift2!(s::Solution{T}, matrix::Matrix{T}, p::Int) where {T}
+    shift!(s, matrix, p, 2)
+end
+
+function shift3!(s::Solution{T}, matrix::Matrix{T}, p::Int) where {T}
+    shift!(s, matrix, p, 3)
 end
