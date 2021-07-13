@@ -45,12 +45,13 @@ end
 function GILS(data::Data{T}, i_max::Int) where {T}
     final = Solution{T}()
     best = Solution{T}()
+    f_lock = Base.Threads.ReentrantLock()
 
     i_ils = data.dimension>=150 ? ceil(Int, data.dimension/2) : data.dimension
     intra_neighbor_list = Function[swap!, revert!, reinsert1!, reinsert2!, reinsert3!]
     inter_neighbor_list = Function[inter_swap!, cross!, shift1!, shift2!, shift3!]
 
-    for it in 1:i_max
+    Threads.@threads for it = 1:i_max
         s = construction(rand(Float32), data.p, data.dimension, data.matrix)
         best.time = typemax(T)
 
@@ -67,10 +68,16 @@ function GILS(data::Data{T}, i_max::Int) where {T}
             perturb!(s, data.matrix)
         end
 
-        if best.time < final.time
-            final = copy(best)
-            println("Iteration ", it)
-            println("New minimum: ", final.time)
+        lock(f_lock) do
+            if best.time < final.time
+                if best.time < 0
+                    return final
+                end
+                final = copy(best)
+                println("\nIteration ", it)
+                println("New minimum: ", final.time, " (", getRealCost(final, data.matrix), ")")
+                println("Route = ", final.routes, "\n")
+            end
         end
     end
 

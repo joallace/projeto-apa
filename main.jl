@@ -4,7 +4,8 @@ include("src/util.jl")
 
 function main()
     data = readInstance(ARGS[1])
-    solution = GILS(data, 100)
+    println(Threads.nthreads())
+    solution = GILS(data, 1000000)
 
     println("\nTime = ", solution.time, " (", getRealCost(solution, data.matrix), ")")
     println("Route = ", solution.routes)
