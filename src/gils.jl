@@ -49,7 +49,7 @@ function GILS(data::Data{T}, i_max::Int) where {T}
 
     i_ils = data.dimension>=150 ? ceil(Int, data.dimension/2) : data.dimension
     intra_neighbor_list = Function[swap!, revert!, reinsert1!, reinsert2!, reinsert3!]
-    inter_neighbor_list = Function[inter_swap!, cross!, shift1!, shift2!, shift3!]
+    inter_neighbor_list = Function[inter_swap11!, inter_swap21!, inter_swap22!, cross!, shift1!, shift2!, shift3!]
 
     Threads.@threads for it = 1:i_max
         s = construction(rand(Float32), data.p, data.dimension, data.matrix)
