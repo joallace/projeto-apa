@@ -78,8 +78,7 @@ function cross!(s::Solution{T}, matrix::Matrix{T}, p::Int) where {T}
 
     for rid1 in 1:length(s.routes)
         for rid2 in 1:length(s.routes)
-
-            rid1 != rid2 && continue
+            rid1 == rid2 && continue
             
             for i in 2:length(s.routes[rid1])-1
                 for j in 2:length(s.routes[rid2])-1
