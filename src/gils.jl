@@ -50,7 +50,7 @@ function GILS(data::Data{T}, i_max::Int) where {T}
     intra_neighbor_list = Function[swap!, revert!, reinsert1!, reinsert2!, reinsert3!]
     inter_neighbor_list = Function[inter_swap!, shift1!, shift2!, shift3!]
 
-    for _ in 1:i_max
+    for it in 1:i_max
         s = construction(rand(Float32), data.p, data.dimension, data.matrix)
         best.time = typemax(T)
 
@@ -69,6 +69,7 @@ function GILS(data::Data{T}, i_max::Int) where {T}
 
         if best.time < final.time
             final = copy(best)
+            println("Iteration ", it)
             println("New minimum: ", final.time)
         end
     end
