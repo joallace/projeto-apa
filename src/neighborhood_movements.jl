@@ -1,16 +1,20 @@
 include("structs.jl")
 
-function inter_swap!(s::Solution{T}, matrix::Matrix{T}, num1::Int, num2::Int) where {T}
+function inter_swap!(s::Solution{T}, matrix::Matrix{T}, p::Int, num1::Int, num2::Int) where {T}
     best = InterMove(0, 0, 0, 0, typemax(T))
 
     for rid1 in 1:length(s.routes)
         for rid2 in rid1+1:length(s.routes)
-
+            
             # Repeating until the swap with lowest delta is found
             for i in 2:length(s.routes[rid1])-num1
                 rm_delta = -matrix[s.routes[rid1][i-1], s.routes[rid1][i]] -           # because we need the previous
                             matrix[s.routes[rid1][i+(num1-1)], s.routes[rid1][i+num1]] # before were the cut was made: i + (num1-1) 
                 for j in 2:length(s.routes[rid2])-num2
+                    if length(s.routes[rid2])-num2+num1 >= p+2
+                        #Doesn't need to check s.routes[rid1] because the swap always reduce or maintain its size
+                        break
+                    end
                     delta = rm_delta +
                             matrix[s.routes[rid2][j-1], s.routes[rid1][i]] +
                             matrix[s.routes[rid1][i+(num1-1)], s.routes[rid2][j+num2]] +
@@ -229,13 +233,13 @@ function shift3!(s::Solution{T}, matrix::Matrix{T}, p::Int) where {T}
 end
 
 function inter_swap11!(s::Solution{T}, matrix::Matrix{T}, p::Int) where{T}
-    inter_swap!(s, matrix, 1, 1)
+    inter_swap!(s, matrix, p, 1, 1)
 end
 
 function inter_swap21!(s::Solution{T}, matrix::Matrix{T}, p::Int) where{T}
-    inter_swap!(s, matrix, 2, 1)
+    inter_swap!(s, matrix, p, 2, 1)
 end
 
 function inter_swap22!(s::Solution{T}, matrix::Matrix{T}, p::Int) where{T}
-    inter_swap!(s, matrix, 2, 2)
+    inter_swap!(s, matrix, p, 2, 2)
 end
