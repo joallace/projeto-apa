@@ -39,9 +39,9 @@ end
 function shift!(s::Solution{T}, matrix::Matrix{T}, p::Int, num::Int) where {T}
     best = InterMove(0, 0, 0, 0, typemax(T))
 
-    for rid1 in 1:length(s.routes)
-        for rid2 in 1:length(s.routes)
-            if length(s.routes[rid2])-2 >= p || rid1==rid2
+    for rid1 in 1:length(s.routes)-1
+        for rid2 in 1:length(s.routes)-1
+            if length(s.routes[rid2])+num >= p+2 || rid1==rid2
                 continue
             end
 
@@ -70,6 +70,41 @@ function shift!(s::Solution{T}, matrix::Matrix{T}, p::Int, num::Int) where {T}
         return true
     end
 
+    return false
+end
+
+function cross!(s::Solution{T}, matrix::Matrix{T}, p::Int) where {T}
+    best = InterMove(0, 0, 0, 0, typemax(T))
+
+    for rid1 in 1:length(s.routes)
+        for rid2 in 1:length(s.routes)
+
+            rid1 != rid2 && continue
+            
+            for i in 2:length(s.routes[rid1])-1
+                for j in 2:length(s.routes[rid2])-1
+                    if length(s.routes[rid2])-j+i >= p+2 || length(s.routes[rid1])-i+j >= p+2
+                        break
+                    end
+
+                    delta = matrix[s.routes[rid1][i], s.routes[rid2][j+1]] +
+                            matrix[s.routes[rid2][j], s.routes[rid1][i+1]] -
+                            matrix[s.routes[rid1][i], s.routes[rid1][i+1]] -
+                            matrix[s.routes[rid2][j], s.routes[rid2][j+1]]
+                    
+                    if delta < 0 && delta < best.time
+                        best = InterMove(rid1, rid2, i, j, delta)
+                    end
+                end
+            end
+        end
+    end
+    
+    if best.time < 0
+        s.time += best.time
+        s.routes[best.rid1], s.routes[best.rid2] = vcat(s.routes[best.rid1][1:best.i], s.routes[best.rid2][best.j+1:end]), vcat(s.routes[best.rid2][1:best.j], s.routes[best.rid1][best.i+1:end])
+        return true
+    end
     return false
 end
 

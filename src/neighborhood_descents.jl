@@ -34,7 +34,6 @@ function RVND!(s::Solution{T}, default_neighbor_list::Vector{Function}, intra_ne
     end
 end
 
-# refatorar pra inter rota
 function intra_RVND!(s::Solution{T}, default_neighbor_list::Vector{Function}, matrix::Matrix{T}) where {T}
     for rid in 1:length(s.routes)
         neighbor_list = copy(default_neighbor_list)
