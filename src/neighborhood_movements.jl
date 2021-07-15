@@ -48,7 +48,7 @@ function inter_swap21!(s::Solution{T}, matrix::Matrix{T}, p::Int) where {T}
                 rm_delta = -matrix[s.routes[rid1][i-1], s.routes[rid1][i]] -           # because we need the previous
                             matrix[s.routes[rid1][i+1], s.routes[rid1][i+2]] # before were the cut was made: i + (num1-1) 
                 for j in 2:length(s.routes[rid2])-1
-                    if length(s.routes[rid2])+1 >= p+2
+                    if length(s.routes[rid2])+1 > p+2
                         #Doesn't need to check s.routes[rid1] because the swap always reduce or maintain its size
                         break
                     end
@@ -146,6 +146,83 @@ function inter_swap33!(s::Solution{T}, matrix::Matrix{T}, p::Int) where {T}
         s.time += best.time
         #s.routes[best.rid1], s.routes[best.rid2] = vcat(s.routes[best.rid1][1:best.i-1], s.routes[best.rid2][best.j:best.j+1], s.routes[best.rid1][best.i+2:end]), vcat(s.routes[best.rid2][1:best.j-1], s.routes[best.rid1][best.i:best.i+1], s.routes[best.rid2][best.j+2:end])
         s.routes[best.rid1][best.i:best.i+2], s.routes[best.rid2][best.j:best.j+2] = s.routes[best.rid2][best.j:best.j+2], s.routes[best.rid1][best.i:best.i+2]
+        return true
+    end
+    return false
+end
+
+function inter_swap44!(s::Solution{T}, matrix::Matrix{T}, p::Int) where {T}
+    best = InterMove(0, 0, 0, 0, typemax(T))
+
+    for rid1 in 1:length(s.routes)
+        for rid2 in rid1+1:length(s.routes)
+            
+            # Repeating until the swap with lowest delta is found
+            for i in 2:length(s.routes[rid1])-4
+                rm_delta = -matrix[s.routes[rid1][i-1], s.routes[rid1][i]] -           # because we need the previous
+                            matrix[s.routes[rid1][i+3], s.routes[rid1][i+4]] # before were the cut was made: i + (num1-1) 
+                for j in 2:length(s.routes[rid2])-4
+                    delta = rm_delta +
+                            matrix[s.routes[rid2][j-1], s.routes[rid1][i]] +
+                            matrix[s.routes[rid1][i+3], s.routes[rid2][j+4]] +
+                            matrix[s.routes[rid1][i-1], s.routes[rid2][j]] +
+                            matrix[s.routes[rid2][j+3], s.routes[rid1][i+4]] -
+                            matrix[s.routes[rid2][j-1], s.routes[rid2][j]] -
+                            matrix[s.routes[rid2][j+3], s.routes[rid2][j+4]]
+                    
+                    if delta < 0 && delta < best.time
+                        best = InterMove(rid1, rid2, i, j, delta)
+                    end
+                end
+            end
+        end
+    end
+    
+    # Making the swap in the route and inserting the delta in the time
+    if best.time < 0
+        s.time += best.time
+        #s.routes[best.rid1], s.routes[best.rid2] = vcat(s.routes[best.rid1][1:best.i-1], s.routes[best.rid2][best.j:best.j+1], s.routes[best.rid1][best.i+2:end]), vcat(s.routes[best.rid2][1:best.j-1], s.routes[best.rid1][best.i:best.i+1], s.routes[best.rid2][best.j+2:end])
+        s.routes[best.rid1][best.i:best.i+3], s.routes[best.rid2][best.j:best.j+3] = s.routes[best.rid2][best.j:best.j+3], s.routes[best.rid1][best.i:best.i+3]
+        return true
+    end
+    return false
+end
+
+function inter_swap!(s::Solution{T}, matrix::Matrix{T}, p::Int, num1::Int, num2::Int) where {T}
+    best = InterMove(0, 0, 0, 0, typemax(T))
+
+    for rid1 in 1:length(s.routes)
+        for rid2 in rid1+1:length(s.routes)
+            
+            # Repeating until the swap with lowest delta is found
+            for i in 2:length(s.routes[rid1])-num1
+                rm_delta = -matrix[s.routes[rid1][i-1], s.routes[rid1][i]] -           # because we need the previous
+                            matrix[s.routes[rid1][i+(num1-1)], s.routes[rid1][i+num1]] # before were the cut was made: i + (num1-1) 
+                for j in 2:length(s.routes[rid2])-num2
+                    if length(s.routes[rid2])-num2+num1 > p+2
+                        #Doesn't need to check s.routes[rid1] because the swap always reduce or maintain its size
+                        break
+                    end
+                    delta = rm_delta +
+                            matrix[s.routes[rid2][j-1], s.routes[rid1][i]] +
+                            matrix[s.routes[rid1][i+(num1-1)], s.routes[rid2][j+num2]] +
+                            matrix[s.routes[rid1][i-1], s.routes[rid2][j]] +
+                            matrix[s.routes[rid2][j+(num2-1)], s.routes[rid1][i+num1]] -
+                            matrix[s.routes[rid2][j-1], s.routes[rid2][j]] -
+                            matrix[s.routes[rid2][j+(num2-1)], s.routes[rid2][j+num2]]
+                    
+                    if delta < 0 && delta < best.time
+                        best = InterMove(rid1, rid2, i, j, delta)
+                    end
+                end
+            end
+        end
+    end
+    
+    # Making the swap in the route and inserting the delta in the time
+    if best.time < 0
+        s.time += best.time
+        s.routes[best.rid1], s.routes[best.rid2] = vcat(s.routes[best.rid1][1:best.i-1], s.routes[best.rid2][best.j:best.j+(num2-1)], s.routes[best.rid1][best.i+(num1):end]), vcat(s.routes[best.rid2][1:best.j-1], s.routes[best.rid1][best.i:best.i+(num1-1)], s.routes[best.rid2][best.j+(num2):end])
         return true
     end
     return false
@@ -341,4 +418,21 @@ end
 
 function shift3!(s::Solution{T}, matrix::Matrix{T}, p::Int) where {T}
     shift!(s, matrix, p, 3)
+end
+
+
+function swap11!(s::Solution{T}, matrix::Matrix{T}, p::Int) where{T}
+    inter_swap!(s, matrix, p, 1, 1)
+end
+
+function swap21!(s::Solution{T}, matrix::Matrix{T}, p::Int) where{T}
+    inter_swap!(s, matrix, p, 2, 1)
+end
+
+function swap22!(s::Solution{T}, matrix::Matrix{T}, p::Int) where{T}
+    inter_swap!(s, matrix, p, 2, 2)
+end
+
+function swap33!(s::Solution{T}, matrix::Matrix{T}, p::Int) where{T}
+    inter_swap!(s, matrix, p, 3, 3)
 end
