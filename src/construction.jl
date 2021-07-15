@@ -32,10 +32,12 @@ function construction(α::AbstractFloat, p::Int, dimension::Int, matrix::Matrix{
     end
 
     n_routes = ceil(Int, (dimension - 1)/p)
-    s = subtours!(candidate_list, 3, n_routes, matrix)
+    subtour_size = 3
+
+    s = subtours!(candidate_list, subtour_size, n_routes, matrix)
 
     for rid in 1:n_routes
-        for _ in 4:p
+        for _ in subtour_size+1:p
             if isempty(candidate_list)
                 break
             end
