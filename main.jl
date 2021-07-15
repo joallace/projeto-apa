@@ -40,14 +40,14 @@ function main()
     choice = parse(Int64, ARGS[2])
     
     if choice == 1
-        solution = GILS(100, neighbor_list, intra_neighbor_list, data, true)
+        solution = GILS(100, neighbor_list, intra_neighbor_list, data)
     elseif choice <= 0 || choice > 4
         printstyled("ERROR:"; color=:red)
         println(" Invalid algorithm")
         printHelp()
         return
     else
-        solution = construction(rand(Float32), data.p, data.dimension, data.matrix)
+        solution = construction(rand(Float32), data.p, data.dimension, data.matrix) #choice 4
         if ARGS[2] == 2
             VND!(solution, neighbor_list, intra_neighbor_list, data.p, data.matrix)
         elseif ARGS[2] == 3
