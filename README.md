@@ -31,3 +31,19 @@ julia -t 6 main.jl instances/cup1.txt 1
 ```
 
 Pode se rodar com o número que quiser, 6 foi só um exemplo.
+
+## Reprodução dos resultados
+
+```shell
+chmod +x tests.sh
+```
+
+```shell
+./tests.sh
+```
+
+## Resultado copa APA
+
+1º Lugar
+
+![](results/podium.png)
