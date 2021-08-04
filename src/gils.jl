@@ -1,7 +1,5 @@
 include("structs.jl")
 include("construction.jl")
-include("neighborhood_movements.jl")
-include("neighborhood_descents.jl")
 include("util.jl")
 
 # A function that perturbs the solution using the Double-bridge method
@@ -42,21 +40,19 @@ function perturb!(s::Solution{T}, matrix::Matrix{T}) where {T}
 end
 
 
-function GILS(data::Data{T}, i_max::Int) where {T}
+function GILS(i_max::Int, neighbor_list::Vector{Function}, intra_neighbor_list::Vector{Function}, data::Data{T}, verbose::Bool = false) where {T}
     final = Solution{T}()
     best = Solution{T}()
     f_lock = Base.Threads.ReentrantLock()
 
-    i_ils = data.dimension>=150 ? ceil(Int, data.dimension/2) : data.dimension
-    intra_neighbor_list = Function[swap!, revert!, reinsert1!, reinsert2!, reinsert3!]
-    inter_neighbor_list = Function[inter_swap11!, inter_swap21!, inter_swap22!, cross!, shift1!, shift2!, shift3!]
+    i_ils = data.dimension>=150 ? ceil(Int, data.dimension/2) : data.dimension  
 
     Threads.@threads for it = 1:i_max
         s = construction(rand(Float32), data.p, data.dimension, data.matrix)
         best.time = typemax(T)
 
         for i in 1:i_ils
-            RVND!(s, inter_neighbor_list, intra_neighbor_list, data.p, data.matrix)
+            RVND!(s, neighbor_list, intra_neighbor_list, data.p, data.matrix)
 
             if s.time < best.time
                 best = copy(s)
@@ -73,10 +69,13 @@ function GILS(data::Data{T}, i_max::Int) where {T}
                 if best.time < 0
                     return final
                 end
+
                 final = copy(best)
-                println("\nIteration ", it)
-                println("New minimum: ", final.time, " (", getRealCost(final, data.matrix), ")")
-                println("Route = ", final.routes, "\n")
+                if verbose
+                    println("\nIteration ", it)
+                    println("New minimum: ", final.time, " (", getRealCost(final, data.matrix), ")")
+                    println("Route = ", final.routes, "\n")
+                end
             end
         end
     end

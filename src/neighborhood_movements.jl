@@ -1,17 +1,19 @@
 include("structs.jl")
 
+
 function inter_swap!(s::Solution{T}, matrix::Matrix{T}, p::Int, num1::Int, num2::Int) where {T}
     best = InterMove(0, 0, 0, 0, typemax(T))
 
     for rid1 in 1:length(s.routes)
-        for rid2 in rid1+1:length(s.routes)
-            
+        scnd_start = num1 == num2 ? rid1+1 : 1
+        for rid2 in scnd_start:length(s.routes)
+            rid1 == rid2 && continue
             # Repeating until the swap with lowest delta is found
             for i in 2:length(s.routes[rid1])-num1
                 rm_delta = -matrix[s.routes[rid1][i-1], s.routes[rid1][i]] -           # because we need the previous
                             matrix[s.routes[rid1][i+(num1-1)], s.routes[rid1][i+num1]] # before were the cut was made: i + (num1-1) 
                 for j in 2:length(s.routes[rid2])-num2
-                    if length(s.routes[rid2])-num2+num1 >= p+2
+                    if num1 != num2 && length(s.routes[rid2])-num2+num1 >= p+2
                         #Doesn't need to check s.routes[rid1] because the swap always reduce or maintain its size
                         break
                     end
@@ -37,6 +39,7 @@ function inter_swap!(s::Solution{T}, matrix::Matrix{T}, p::Int, num1::Int, num2:
         s.routes[best.rid1], s.routes[best.rid2] = vcat(s.routes[best.rid1][1:best.i-1], s.routes[best.rid2][best.j:best.j+(num2-1)], s.routes[best.rid1][best.i+(num1):end]), vcat(s.routes[best.rid2][1:best.j-1], s.routes[best.rid1][best.i:best.i+(num1-1)], s.routes[best.rid2][best.j+(num2):end])
         return true
     end
+
     return false
 end
 
@@ -108,6 +111,7 @@ function cross!(s::Solution{T}, matrix::Matrix{T}, p::Int) where {T}
         s.routes[best.rid1], s.routes[best.rid2] = vcat(s.routes[best.rid1][1:best.i], s.routes[best.rid2][best.j+1:end]), vcat(s.routes[best.rid2][1:best.j], s.routes[best.rid1][best.i+1:end])
         return true
     end
+
     return false
 end
 
@@ -220,6 +224,7 @@ function reinsert3!(s::Solution{T}, rid::Int, matrix::Matrix{T}) where {T}
     reinsert!(s, rid, matrix, 3)
 end
 
+
 function shift1!(s::Solution{T}, matrix::Matrix{T}, p::Int) where {T}
     shift!(s, matrix, p, 1)
 end
@@ -232,14 +237,19 @@ function shift3!(s::Solution{T}, matrix::Matrix{T}, p::Int) where {T}
     shift!(s, matrix, p, 3)
 end
 
-function inter_swap11!(s::Solution{T}, matrix::Matrix{T}, p::Int) where{T}
+
+function swap11!(s::Solution{T}, matrix::Matrix{T}, p::Int) where{T}
     inter_swap!(s, matrix, p, 1, 1)
 end
 
-function inter_swap21!(s::Solution{T}, matrix::Matrix{T}, p::Int) where{T}
+function swap21!(s::Solution{T}, matrix::Matrix{T}, p::Int) where{T}
     inter_swap!(s, matrix, p, 2, 1)
 end
 
-function inter_swap22!(s::Solution{T}, matrix::Matrix{T}, p::Int) where{T}
+function swap22!(s::Solution{T}, matrix::Matrix{T}, p::Int) where{T}
     inter_swap!(s, matrix, p, 2, 2)
+end
+
+function swap33!(s::Solution{T}, matrix::Matrix{T}, p::Int) where{T}
+    inter_swap!(s, matrix, p, 3, 3)
 end

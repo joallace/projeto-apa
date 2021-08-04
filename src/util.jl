@@ -17,3 +17,13 @@ function getRealCost(s::Solution{T}, matrix::Matrix{T}) where {T}
     
     return sum
 end
+
+function printCup(v::Vector{Vector{Int}})
+    for i in 1:length(v)
+        for j in 1:length(v[i])
+            v[i][j] -= 1
+        end
+    end
+    
+    print(replace(join(v, " ; "), r"[\[\]]"=>""), "\n")
+end
