@@ -8,7 +8,7 @@ Esse repositório contém o nosso projeto final da disciplina Análise e Projeto
 - [x] Implementação dos movimentos de vizinhança (Mínimo 3);
 - [X] Implementação do algoritmo de busca local chamado VND (Variable Neighborhood Descent);
 - [X] Implementação de uma metaheurística (OPCIONAL);
-- [ ] Resultados computacionais: criar uma tabela que contenha os resultados obtidos pela(s) heurística(s)
+- [X] Resultados computacionais: criar uma tabela que contenha os resultados obtidos pela(s) heurística(s)
       construtiva(s) e pelo VND, e que compare tais resultados com a solução ótima de cada instância.
       
      Essa tabela deverá conter os seguintes dados para cada heurística construtiva e para o VND:
